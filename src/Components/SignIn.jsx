@@ -4,6 +4,17 @@ import gsap from "gsap";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  
+  // Sign In state
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  
+  // Sign Up state
+  const [signUpName, setSignUpName] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
 
  
   const shellRef = useRef(null);
@@ -17,6 +28,78 @@ export default function AuthPage() {
 
   const leftImg = useRef(null);
   const rightImg = useRef(null);
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signInEmail, password: signInPassword }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        alert("Sign In successful!");
+        setSignInEmail("");
+        setSignInPassword("");
+      } else if (data.error) {
+        setError(data.error);
+      } else {
+        setError("Sign in failed");
+      }
+    } catch (err) {
+      setError("Connection error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: signUpName, email: signUpEmail, password: signUpPassword }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.message || response.ok) {
+        alert("Account created! Please sign in.");
+        setSignUpName("");
+        setSignUpEmail("");
+        setSignUpPassword("");
+        setIsSignUp(false);
+      } else if (data.error) {
+        setError(data.error);
+      } else {
+        setError("Sign up failed");
+      }
+    } catch (err) {
+      setError("Connection error: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   useLayoutEffect(() => {
@@ -87,15 +170,19 @@ export default function AuthPage() {
               <h1 className="text-4xl font-bold text-[#5E4A80] mb-4">Sign In</h1>
               <p className="text-[#A89BB5] mb-10">Welcome back, login to continue!</p>
 
-              <div className="space-y-6 max-w-md">
+              <form onSubmit={handleSignIn} className="space-y-6 max-w-md">
+                {error && <p className="text-red-500 text-sm">{error}</p>}
                 <div>
-                  <label className="block text-[#A89BB5] mb-2">Username</label>
+                  <label className="block text-[#A89BB5] mb-2">Email</label>
                   <div className="flex items-center bg-white/90 border border-[#DCD0EB] rounded-xl px-4 py-3">
-                    <User className="text-[#A89BB5] mr-3" />
+                    <Mail className="text-[#A89BB5] mr-3" />
                     <input
-                      type="text"
-                      placeholder="Enter username"
+                      type="email"
+                      placeholder="Enter email"
+                      value={signInEmail}
+                      onChange={(e) => setSignInEmail(e.target.value)}
                       className="bg-transparent outline-none text-[#5E4A80] w-full placeholder-[#A89BB5]"
+                      required
                     />
                   </div>
                 </div>
@@ -106,13 +193,20 @@ export default function AuthPage() {
                     <input
                       type="password"
                       placeholder="Enter password"
+                      value={signInPassword}
+                      onChange={(e) => setSignInPassword(e.target.value)}
                       className="bg-transparent outline-none text-[#5E4A80] w-full placeholder-[#A89BB5]"
+                      required
                     />
                   </div>
                 </div>
 
-                <button className="w-full py-4 mt-2 bg-gradient-to-r from-[#725B95] to-[#5E4A80] hover:from-[#5E4A80] hover:to-[#725B95] rounded-xl text-white font-semibold text-lg shadow-lg transition-transform hover:scale-[1.02]">
-                  Sign In
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full py-4 mt-2 bg-gradient-to-r from-[#725B95] to-[#5E4A80] hover:from-[#5E4A80] hover:to-[#725B95] rounded-xl text-white font-semibold text-lg shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-50"
+                >
+                  {loading ? "Signing In..." : "Sign In"}
                 </button>
 
                 <p className="text-[#A89BB5] text-sm">
@@ -125,7 +219,7 @@ export default function AuthPage() {
                     Create an account
                   </button>
                 </p>
-              </div>
+              </form>
             </div>
           </section>
 
@@ -151,13 +245,17 @@ export default function AuthPage() {
               <h2 className="text-4xl font-bold text-[#5E4A80] mb-4">Create Account</h2>
               <p className="text-[#A89BB5] mb-10">Join us and start your journey!</p>
 
-              <div className="space-y-6 w-full max-w-md">
+              <form onSubmit={handleSignUp} className="space-y-6 w-full max-w-md">
+                {error && <p className="text-red-500 text-sm">{error}</p>}
                 <div className="flex items-center bg-white/90 border border-[#DCD0EB] rounded-xl px-4 py-3">
                   <User className="text-[#A89BB5] mr-3" />
                   <input
                     type="text"
                     placeholder="Username"
+                    value={signUpName}
+                    onChange={(e) => setSignUpName(e.target.value)}
                     className="bg-transparent outline-none text-[#5E4A80] w-full placeholder-[#A89BB5]"
+                    required
                   />
                 </div>
                 <div className="flex items-center bg-white/90 border border-[#DCD0EB] rounded-xl px-4 py-3">
@@ -165,7 +263,10 @@ export default function AuthPage() {
                   <input
                     type="email"
                     placeholder="Email"
+                    value={signUpEmail}
+                    onChange={(e) => setSignUpEmail(e.target.value)}
                     className="bg-transparent outline-none text-[#5E4A80] w-full placeholder-[#A89BB5]"
+                    required
                   />
                 </div>
                 <div className="flex items-center bg-white/90 border border-[#DCD0EB] rounded-xl px-4 py-3">
@@ -173,12 +274,19 @@ export default function AuthPage() {
                   <input
                     type="password"
                     placeholder="Password"
+                    value={signUpPassword}
+                    onChange={(e) => setSignUpPassword(e.target.value)}
                     className="bg-transparent outline-none text-[#5E4A80] w-full placeholder-[#A89BB5]"
+                    required
                   />
                 </div>
 
-                <button className="w-full py-4 mt-2 bg-gradient-to-r from-[#725B95] to-[#A89BB5] hover:from-[#5E4A80] hover:to-[#725B95] rounded-xl text-white font-semibold text-lg shadow-lg transition-transform hover:scale-[1.02]">
-                  Sign Up
+                <button 
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 mt-2 bg-gradient-to-r from-[#725B95] to-[#A89BB5] hover:from-[#5E4A80] hover:to-[#725B95] rounded-xl text-white font-semibold text-lg shadow-lg transition-transform hover:scale-[1.02] disabled:opacity-50"
+                >
+                  {loading ? "Creating Account..." : "Sign Up"}
                 </button>
 
                 <button
@@ -188,7 +296,7 @@ export default function AuthPage() {
                 >
                   Back to Sign In
                 </button>
-              </div>
+              </form>
             </div>
           </section>
         </div>
@@ -199,3 +307,4 @@ export default function AuthPage() {
     </div>
   );
 }
+
