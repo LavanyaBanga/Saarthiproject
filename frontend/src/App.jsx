@@ -6,14 +6,9 @@ import {
 } from "react-router-dom";
 import { motion } from "framer-motion";
 import AuthContainer from "./Components/SignIn";
-import MoodTracker from "./Components/MoodTracker";
-import StepperFormWithOptions from "./Components/Stepper/User";
 import DoctorStepperForm from "./Components/Stepper/Doctor";
-import OrganizationStepperForm from "./Components/Stepper/Organiser";
 // It should be capital C:
 import Chatbot from "./Components/Chatbot/Chatbot";
-import BlogPage from "./Components/Blog/blogpost";
-import ProductPage from "./Components/E-Commerce/ProductPage";
 import UserDashboard from "./Components/UserDashboard/user";
 import Booking from "./Components/UserDashboard/Booking";
 import Success from "./Components/UserDashboard/Success";
