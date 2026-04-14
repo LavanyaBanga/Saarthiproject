@@ -8,7 +8,6 @@ const errorHandler = require("./Middleware/errorHandler");
 
 const app = express();
 
-// Connect database
 connectDB();
 
 // Middleware
