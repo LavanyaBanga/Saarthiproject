@@ -6,8 +6,7 @@ import {
 } from "react-router-dom";
 import { motion } from "framer-motion";
 import AuthContainer from "./Components/SignIn";
-import DoctorStepperForm from "./Components/Stepper/Doctor";
-// It should be capital C:
+
 import Chatbot from "./Components/Chatbot/Chatbot";
 import UserDashboard from "./Components/UserDashboard/user";
 import Booking from "./Components/UserDashboard/Booking";
@@ -124,14 +123,12 @@ const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
 
   { path: "/login", element: <AuthContainer /> },
-  { path: "/moodtracker", element: <MoodTracker /> },
-  { path: "/product", element: <ProductPage /> },
-  { path: "/stepper", element: <StepperFormWithOptions /> },
-  { path: "/doctor-signup", element: <DoctorStepperForm /> },
-  { path: "/organiser-signup", element: <OrganizationStepperForm /> },
+  
+ 
+ 
+  
   { path: "/Chatbot", element: <Chatbot /> },
-  { path: "/blog", element: <BlogPage /> },
-
+  
   { path: "/UserDashboard", element: <UserDashboard /> },
   { path: "/booking", element: <Booking /> },
   { path: "/success", element: <Success /> },
